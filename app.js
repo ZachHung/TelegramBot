@@ -21,5 +21,5 @@ if (process.env.NODE_ENV !== 'development') {
   process.once('SIGINT', () => bot.stop('SIGINT'));
   process.once('SIGTERM', () => bot.stop('SIGTERM'));
 }
-let port = process.env.PORT | 6969;
+let port = process.env.PORT || 6969;
 app.listen(port, () => console.log('Listening on', port));
