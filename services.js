@@ -1,24 +1,28 @@
-import { bot } from "./app.js";
-import { notion } from "./app.js";
+import { Client } from '@notionhq/client';
+import bot from './bot.js';
+
+const notion = new Client({
+  auth: process.env.NOTION_TOKEN,
+});
 class ChatService {
   sendMessage(req, res) {
-    let message = `${req.body.page.properties["Tên (hoặc FB)"].title[0].text.content} đã đến hạn`;
-    bot.telegram.sendMessage(process.env.CHAT_ID, message);
+    let message = `‼ ${req.body.page.properties['Tên (hoặc FB)'].title[0].text.content} đã đến hạn ‼`;
+    bot.api.sendMessage(process.env.CHAT_ID, message);
     res.status(200).json(message);
   }
 
-  async createNotionPage(req, res) {
+  async createNotionPage(data) {
     try {
       let result = await notion.pages.create({
         parent: {
           database_id: process.env.NOTION_DATABASE_ID,
         },
         properties: {
-          "Tên (hoặc FB)": {
+          'Tên (hoặc FB)': {
             title: [
               {
                 text: {
-                  content: "Dummy Name",
+                  content: data.name,
                 },
               },
             ],
@@ -27,9 +31,9 @@ class ChatService {
           Username: {
             rich_text: [
               {
-                type: "text",
+                type: 'text',
                 text: {
-                  content: "Dummy username",
+                  content: data.username,
                 },
               },
             ],
@@ -39,7 +43,7 @@ class ChatService {
             rich_text: [
               {
                 text: {
-                  content: "Dummy password",
+                  content: data.password,
                 },
               },
             ],
@@ -49,7 +53,7 @@ class ChatService {
             rich_text: [
               {
                 text: {
-                  content: "Dummy slot name",
+                  content: data.slotName,
                 },
               },
             ],
@@ -57,20 +61,20 @@ class ChatService {
 
           Date: {
             date: {
-              start: "2023-01-01",
+              start: data.date,
             },
           },
 
-          "Subcribe?": {
+          'Subcribe?': {
             select: {
-              name: "3 tháng",
+              name: data.time,
             },
           },
         },
       });
-      res.send(result);
+      return result;
     } catch (err) {
-      res.send(err);
+      throw Error(err);
     }
   }
 }
