@@ -1,21 +1,28 @@
 import { Client } from '@notionhq/client';
+import { NextFunction, Request, Response } from 'express';
 import bot from './bot.js';
+import { getEnv } from './helpers.js';
+import { INotionPage } from './interface.js';
 
 const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
+  auth: getEnv('NOTION_TOKEN'),
 });
 class ChatService {
-  sendMessage(req, res) {
-    let message = `‼ ${req.body.page.properties['Tên (hoặc FB)'].title[0].text.content} đã đến hạn ‼`;
-    bot.api.sendMessage(process.env.CHAT_ID, message);
-    res.status(200).json(message);
+  async sendMessage(req: Request, res: Response, next: NextFunction) {
+    try {
+      let message = `‼ ${req.body.page.properties['Tên (hoặc FB)'].title[0].text.content} đã đến hạn ‼`;
+      await bot.api.sendMessage(getEnv('CHAT_ID'), message);
+      res.status(200).json(message);
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async createNotionPage(data) {
+  async createNotionPage(data: INotionPage) {
     try {
       let result = await notion.pages.create({
         parent: {
-          database_id: process.env.NOTION_DATABASE_ID,
+          database_id: getEnv('NOTION_DATABASE_ID'),
         },
         properties: {
           'Tên (hoặc FB)': {
@@ -74,7 +81,7 @@ class ChatService {
       });
       return result;
     } catch (err) {
-      throw Error(err);
+      throw new Error(err as string);
     }
   }
 }
