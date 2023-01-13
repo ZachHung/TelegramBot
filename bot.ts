@@ -31,14 +31,14 @@ async function commandCreateNotionPage(
   conversation: MyConversation,
   ctx: MyContext,
 ) {
-  let questions = [
+  const questions = [
     "What is the user's Facebook name:",
     'What is the username:',
     'What is the slot name:',
     'What is the password:',
     'What is subscribe date (YYYY-MM-DD):',
   ];
-  let answers = {
+  const answers = {
     name: '',
     username: '',
     slotName: '',
@@ -49,7 +49,7 @@ async function commandCreateNotionPage(
 
   for (let index = 0; index < questions.length; ++index) {
     await ctx.reply(questions[index]);
-    let answer = await conversation.waitFor(':text');
+    const answer = await conversation.waitFor(':text');
     answers[Object.keys(answers)[index] as keyof typeof answers] =
       answer.msg.text;
 
@@ -58,7 +58,7 @@ async function commandCreateNotionPage(
       answers.date !== ''
     ) {
       await ctx.reply(`⁉ Invalid date format ⁉\n${questions[index]}`);
-      let answer = await conversation.waitFor(':text');
+      const answer = await conversation.waitFor(':text');
       answers[Object.keys(answers)[index] as keyof typeof answers] =
         answer.msg.text;
     }
@@ -72,7 +72,7 @@ async function commandCreateNotionPage(
   await ctx.reply('How long is the subscription?', {
     reply_markup: keyboard,
   });
-  let time = await conversation.waitFor(':text');
+  const time = await conversation.waitFor(':text');
 
   await ChatService.createNotionPage({
     time: time.msg.text,

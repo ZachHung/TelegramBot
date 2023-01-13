@@ -10,7 +10,7 @@ const notion = new Client({
 class ChatService {
   async sendMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      let message = `‼ ${req.body.page.properties['Tên (hoặc FB)'].title[0].text.content} đã đến hạn ‼`;
+      const message = `‼ ${req.body.page.properties['Tên (hoặc FB)'].title[0].text.content} đã đến hạn ‼`;
       await bot.api.sendMessage(getEnv('CHAT_ID'), message);
       res.status(200).json(message);
     } catch (error) {
@@ -20,7 +20,7 @@ class ChatService {
 
   async createNotionPage(data: INotionPage) {
     try {
-      let result = await notion.pages.create({
+      const result = await notion.pages.create({
         parent: {
           database_id: getEnv('NOTION_DATABASE_ID'),
         },

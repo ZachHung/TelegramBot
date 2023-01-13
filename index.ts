@@ -13,6 +13,7 @@ import {
 } from './helpers.js';
 
 const app = express();
+
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(requestLogger);
@@ -23,9 +24,14 @@ app.use(invalidPathHandler);
 
 if (getEnv('NODE_ENV') === 'development') bot.start();
 
-let port = getEnv('PORT') || 6969;
-app.listen(port, async () => {
-  console.log('Listening on', port);
-  if (process.env.NODE_ENV !== 'development')
+const port = getEnv('PORT') || 6969;
+
+if (getEnv('NODE_ENV') !== 'development') {
+  app.listen(port, async () => {
     await bot.api.setWebhook(`https://${process.env.HOST}/bot`);
-});
+  });
+} else {
+  app.listen(port, async () => {
+    console.log('Listening on', port);
+  });
+}

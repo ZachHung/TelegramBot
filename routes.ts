@@ -7,8 +7,10 @@ const router = Router();
 const route = (app: Express) => {
   app.use(
     '/telegram',
-    router.post('', (req: Request, res: Response, next: NextFunction) =>
-      ChatService.sendMessage(req, res, next),
+    router.post(
+      '',
+      async (req: Request, res: Response, next: NextFunction) =>
+        await ChatService.sendMessage(req, res, next),
     ),
   );
   if (process.env.NODE_ENV !== 'development') {
