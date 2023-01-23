@@ -1,7 +1,8 @@
-import ChatService from './services.js';
 import { Router, Express, Request, Response, NextFunction } from 'express';
 import { webhookCallback } from 'grammy';
 import bot from './bot.js';
+import ChatService from './services.js';
+const chatService = new ChatService();
 
 const router = Router();
 const route = (app: Express) => {
@@ -10,7 +11,7 @@ const route = (app: Express) => {
     router.post(
       '',
       async (req: Request, res: Response, next: NextFunction) =>
-        await ChatService.sendMessage(req, res, next),
+        await chatService.sendMessage(req, res, next),
     ),
   );
   // app.use(
@@ -18,8 +19,8 @@ const route = (app: Express) => {
   //   router.get(
   //     '',
   //     async (req: Request, res: Response, next: NextFunction) =>
-  //       await ChatService.logAllUser(req, res, next),
-  // //   ),
+  //       await chatService.logAllUser(req, res, next),
+  //   ),
   // );
   if (process.env.NODE_ENV !== 'development') {
     app.use('/bot', webhookCallback(bot, 'express'));
