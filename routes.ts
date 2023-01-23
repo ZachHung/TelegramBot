@@ -13,6 +13,14 @@ const route = (app: Express) => {
         await ChatService.sendMessage(req, res, next),
     ),
   );
+  // app.use(
+  //   '/test',
+  //   router.get(
+  //     '',
+  //     async (req: Request, res: Response, next: NextFunction) =>
+  //       await ChatService.logAllUser(req, res, next),
+  // //   ),
+  // );
   if (process.env.NODE_ENV !== 'development') {
     app.use('/bot', webhookCallback(bot, 'express'));
   }

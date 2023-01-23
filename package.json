@@ -24,6 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "@grammyjs/conversations": "^1.1.0",
+    "@grammyjs/menu": "^1.1.2",
     "@notionhq/client": "^2.2.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
