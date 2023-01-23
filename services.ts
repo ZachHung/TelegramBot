@@ -84,6 +84,24 @@ class ChatService {
       throw new Error(err as string);
     }
   }
+
+  async logAllUser(): Promise<any[]> {
+    try {
+      const message = `hello`;
+      const response = await notion.databases.query({
+        database_id: getEnv('NOTION_DATABASE_ID'),
+      });
+      const listAllUser = response.results.map(
+        (result) => (result as any).properties,
+      );
+
+      return listAllUser;
+
+      // status(200).json(message);
+    } catch (err) {
+      throw new Error(err as string);
+    }
+  }
 }
 
 export default new ChatService();
