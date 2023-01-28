@@ -3,8 +3,15 @@ export interface INotionPage {
   username: string;
   password: string;
   date: string;
-  time: string;
+  duration: string;
   slotName: string;
+}
+export interface IUser extends INotionPage {
+  id: string;
+}
+
+export interface SessionData {
+  favoriteIds: string[];
 }
 
 export class AppError extends Error {

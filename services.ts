@@ -2,10 +2,13 @@ import { Client } from '@notionhq/client';
 import { NextFunction, Request, Response } from 'express';
 import { writeFileSync } from 'fs';
 import bot from './bot.js';
+import moment from 'moment';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import { getEnv } from './helpers.js';
-import { INotionPage } from './interface.js';
+import { INotionPage, IUser } from './interface.js';
+import fs from 'fs';
+import { ident } from '@grammyjs/conversations/out/utils.js';
 
 const notion = new Client({
   auth: getEnv('NOTION_TOKEN'),
@@ -13,7 +16,7 @@ const notion = new Client({
 class ChatService {
   async sendMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      const message = `‼ ${req.body.page.properties['Tên (hoặc FB)'].title[0].text.content} đã đến hạn ‼`;
+      const message = `‼ ${req.body.page.properties.Customer_name.title[0].text.content} đã đến hạn ‼`;
       await bot.api.sendMessage(getEnv('CHAT_ID'), message);
       res.status(200).json(message);
     } catch (error) {
@@ -28,7 +31,7 @@ class ChatService {
           database_id: getEnv('NOTION_DATABASE_ID'),
         },
         properties: {
-          'Tên (hoặc FB)': {
+          Customer_name: {
             title: [
               {
                 text: {
@@ -75,9 +78,9 @@ class ChatService {
             },
           },
 
-          'Subcribe?': {
+          Duration: {
             select: {
-              name: data.time,
+              name: `${data.duration} tháng`,
             },
           },
         },
@@ -88,26 +91,119 @@ class ChatService {
     }
   }
 
-  async logAllUser(): Promise<INotionPage[]> {
+  async logAllUser(): Promise<IUser[]> {
     try {
       const response = await notion.databases.query({
         database_id: getEnv('NOTION_DATABASE_ID'),
       });
-      let listAllUser = response.results.map(
-        (result) => (result as any).properties,
-      );
-
-      listAllUser = listAllUser.map((user): INotionPage => {
+      fs.writeFileSync('./test', JSON.stringify(response));
+      let listAllUser = response.results.map((result) => {
         return {
-          name: user['Tên (hoặc FB)'].title[0].text.content || '',
-          username: user.Username.rich_text[0].text.content || '',
-          password: user.Pass.rich_text[0].text.content || '',
-          date: user.Date.date.start || '',
-          time: user['Subcribe?'].select?.name || '',
-          slotName: user.Slot.rich_text[0].text.content || '',
+          id: result.id,
+          prop: (result as any).properties,
         };
       });
-      return listAllUser;
+
+      let users = listAllUser.map((user): IUser => {
+        return {
+          name: user.prop.Customer_name.title[0].text.content || '',
+          username: user.prop.Username.rich_text[0].text.content || '',
+          password: user.prop.Pass.rich_text[0].text.content || '',
+          date:
+            moment(user.prop.Date.date.start, 'YYYY-MM-DD').format('D/M/YY') ||
+            '',
+          duration: user.prop.Duration.select?.name || '',
+          slotName: user.prop.Slot.rich_text[0].text.content || '',
+          id: user.id || '',
+        };
+      });
+      return users;
+    } catch (err) {
+      throw new Error(err as string);
+    }
+  }
+
+  async achriveNotionPage(id: string) {
+    try {
+      await notion.pages.update({
+        page_id: id,
+        archived: true,
+      });
+    } catch (err) {
+      throw new Error(err as string);
+    }
+  }
+
+  async updateNotionPage(id: string, property: string, data: string) {
+    try {
+      let a;
+      switch (property) {
+        case 'username':
+          a = {
+            Username: {
+              rich_text: [
+                {
+                  type: 'text',
+                  text: {
+                    content: data,
+                  },
+                },
+              ],
+            },
+          };
+          break;
+        case 'slotName':
+          a = {
+            Slot: {
+              rich_text: [
+                {
+                  text: {
+                    content: data,
+                  },
+                },
+              ],
+            },
+          };
+          break;
+        case 'password':
+          a = {
+            Pass: {
+              rich_text: [
+                {
+                  text: {
+                    content: data,
+                  },
+                },
+              ],
+            },
+          };
+          break;
+        case 'date':
+          a = {
+            Date: {
+              date: {
+                start: moment(data, 'D/M/YY').format('YYYY-MM-DD'),
+              },
+            },
+          };
+          break;
+        case 'time':
+          a = {
+            'Subcribe?': {
+              select: {
+                name: data,
+              },
+            },
+          };
+          break;
+
+        default:
+          break;
+      }
+      await notion.pages.update({
+        page_id: id,
+        properties: a as any,
+      });
     } catch (err) {
       throw new Error(err as string);
     }
