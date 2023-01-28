@@ -14,17 +14,16 @@ const route = (app: Express) => {
         await chatService.sendMessage(req, res, next),
     ),
   );
-  // app.use(
-  //   '/test',
-  //   router.get(
-  //     '',
-  //     async (req: Request, res: Response, next: NextFunction) =>
-  //       await chatService.logAllUser(req, res, next),
-  //   ),
-  // );
+
   if (process.env.NODE_ENV !== 'development') {
     app.use('/bot', webhookCallback(bot, 'express'));
   }
+  app.post('/webhook', (req, res) => {
+    let body = req.body;
+
+    console.log(`\u{1F7EA} Received webhook:`);
+    console.dir(body, { depth: null });
+  });
 };
 
 export default route;

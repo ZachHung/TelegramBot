@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { AppError } from './interface';
+import { AppError } from './interface.js';
 
 export const getEnv = (name: string): string => {
   const value = process.env[name];
