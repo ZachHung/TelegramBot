@@ -80,7 +80,7 @@ async function commandCreateNotionPage(
       answers[Object.keys(answers)[index] as keyof typeof answers] = moment(
         answer.msg.text,
         'D/M/YY',
-      ).format('YYYY-MM-DD');
+      ).format('D/M/YY');
     }
   }
 
