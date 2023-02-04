@@ -74,7 +74,7 @@ class ChatService {
 
           Date: {
             date: {
-              start: data.date,
+              start: moment(data.date, 'D/M/YY').format('YYYY-MM-DD'),
             },
           },
 
