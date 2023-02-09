@@ -1,14 +1,11 @@
 import { Client } from '@notionhq/client';
 import { NextFunction, Request, Response } from 'express';
-import { writeFileSync } from 'fs';
-import bot from './bot.js';
+import bot from './bot_telegram.js';
 import moment from 'moment';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import { getEnv } from './helpers.js';
 import { INotionPage, IUser } from './interface.js';
-import fs from 'fs';
-import { ident } from '@grammyjs/conversations/out/utils.js';
 
 const notion = new Client({
   auth: getEnv('NOTION_TOKEN'),
@@ -96,7 +93,6 @@ class ChatService {
       const response = await notion.databases.query({
         database_id: getEnv('NOTION_DATABASE_ID'),
       });
-      fs.writeFileSync('./test', JSON.stringify(response));
       let listAllUser = response.results.map((result) => {
         return {
           id: result.id,

@@ -3,7 +3,7 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import route from './routes.js';
-import bot from './bot.js';
+import bot from './bot_telegram.js';
 import {
   errorLogger,
   errorResponder,
@@ -19,7 +19,7 @@ app.use(express.json({ limit: '1mb' }));
 app.use(requestLogger);
 route(app);
 app.use(errorLogger);
-app.use(errorResponder);
+// app.use(errorResponder);
 app.use(invalidPathHandler);
 
 if (getEnv('NODE_ENV') === 'development') bot.start();

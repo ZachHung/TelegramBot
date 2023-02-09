@@ -1,8 +1,12 @@
 import { Router, Express, Request, Response, NextFunction } from 'express';
 import { webhookCallback } from 'grammy';
-import bot from './bot.js';
-import ChatService from './services.js';
+import bot from './bot_telegram.js';
+import { getEnv } from './helpers.js';
+import ChatService from './services_telegram.js';
 const chatService = new ChatService();
+import * as dotenv from 'dotenv';
+dotenv.config();
+import { getWebhook, postWebhook } from './bot_messenger.js';
 
 const router = Router();
 const route = (app: Express) => {
@@ -18,12 +22,8 @@ const route = (app: Express) => {
   if (process.env.NODE_ENV !== 'development') {
     app.use('/bot', webhookCallback(bot, 'express'));
   }
-  app.post('/webhook', (req, res) => {
-    let body = req.body;
-
-    console.log(`\u{1F7EA} Received webhook:`);
-    console.dir(body, { depth: null });
-  });
+  app.post('/webhook', postWebhook);
+  app.get('/webhook', getWebhook);
 };
 
 export default route;
