@@ -16,10 +16,8 @@ import { Menu, MenuRange } from '@grammyjs/menu';
 import * as dotenv from 'dotenv';
 import moment from 'moment';
 import { getEnv } from './helpers.js';
-import { Console } from 'console';
-import ChatService from './services.js';
+import ChatService from './services_telegram.js';
 import { INotionPage, SessionData } from './interface.js';
-import fs from 'fs';
 dotenv.config();
 
 const chatService = new ChatService();
@@ -91,7 +89,7 @@ async function commandCreateNotionPage(
   await ctx.reply('🎉 New account has been added! 🎉');
 }
 
-async function edit(conversation: MyConversation, ctx: MyContext) {
+async function editNotionPage(conversation: MyConversation, ctx: MyContext) {
   await ctx.reply(`Enter your new ${testProp}?`);
   let message = await conversation.waitFor(':text');
   let answer = message.msg.text;
@@ -112,7 +110,7 @@ async function edit(conversation: MyConversation, ctx: MyContext) {
 // ==========================================================
 
 bot.use(createConversation(commandCreateNotionPage));
-bot.use(createConversation(edit));
+bot.use(createConversation(editNotionPage));
 
 const mainText = 'Choose one user to inspect';
 const mainMenu = new Menu<MyContext>('user-list');

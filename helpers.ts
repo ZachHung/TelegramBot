@@ -36,7 +36,6 @@ export const errorResponder = (
   response: Response,
 ) => {
   response.header('Content-Type', 'application/json');
-
   const status = error.statusCode || 400;
   response.status(status).send(error.message);
 };
