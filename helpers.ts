@@ -35,7 +35,8 @@ export const errorResponder = (
   request: Request,
   response: Response,
 ) => {
-  response.setHeader('Content-Type', 'application/json');
+
+  response.header('Content-Type', 'application/json');
   const status = error.statusCode || 400;
   response.status(status).send(error.message);
 };

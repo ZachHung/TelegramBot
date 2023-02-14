@@ -15,6 +15,7 @@ export async function handleGetStarted(sender_psid: any) {
       await callSendAPI(sender_psid, response);
       await callSendAPI(sender_psid, await sendMenu());
 
+
       resolve('done');
     } catch (e) {
       reject(e);
@@ -23,6 +24,7 @@ export async function handleGetStarted(sender_psid: any) {
 }
 
 async function sendMenu() {
+
   let response = {
     attachment: {
       type: 'template',
@@ -41,6 +43,7 @@ async function sendMenu() {
               },
               {
                 type: 'postback',
+
                 title: 'Lấy mật khẩu',
                 payload: 'GET_PASSWORD',
               },
@@ -116,4 +119,5 @@ export async function validateUser(combo: any, sender_psid: any) {
       text: 'Invalid credentials. Check again.',
     });
   console.log(user);
+
 }
