@@ -99,6 +99,7 @@ export async function validateUser(combo: any, sender_psid: any) {
     text: 'Validating...',
   });
   credentials = combo.split('-');
+
   console.log(combo);
 
   const usersList = await chatService.logAllUser();
