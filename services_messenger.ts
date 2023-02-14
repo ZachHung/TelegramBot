@@ -1,11 +1,9 @@
 import * as dotenv from 'dotenv';
-import { response } from 'express';
-dotenv.config();
 import { getEnv } from './helpers.js';
 import { callSendAPI } from './bot_messenger.js';
 import ChatService from './services_telegram.js';
-import { writeFileSync } from 'fs';
 const chatService = new ChatService();
+dotenv.config();
 
 export async function handleGetStarted(sender_psid: any) {
   return new Promise(async (resolve: any, reject: any) => {
@@ -15,7 +13,8 @@ export async function handleGetStarted(sender_psid: any) {
         text: `'Đây là một con bot được xây dựng để hỗ trợ TTL trong việc buôn bán netflix.\n Hướng dẫn sử dụng: '`,
       };
       await callSendAPI(sender_psid, response);
-      await callSendAPI(sender_psid, await sendGetStartedTemplate());
+      await callSendAPI(sender_psid, await sendMenu());
+
 
       resolve('done');
     } catch (e) {
@@ -24,7 +23,8 @@ export async function handleGetStarted(sender_psid: any) {
   });
 }
 
-async function sendGetStartedTemplate() {
+async function sendMenu() {
+
   let response = {
     attachment: {
       type: 'template',
@@ -38,6 +38,12 @@ async function sendGetStartedTemplate() {
             buttons: [
               {
                 type: 'postback',
+                title: 'Xác nhận user',
+                payload: 'VALIDATE_USER',
+              },
+              {
+                type: 'postback',
+
                 title: 'Lấy mật khẩu',
                 payload: 'GET_PASSWORD',
               },
@@ -77,20 +83,41 @@ export async function getUserName(sender_psid: any) {
       console.error('Error:', error);
     });
 }
-
+let user: any = {
+  name: 'abc',
+  username: 'a@b.c',
+  password: '123456',
+  date: '10/2/23',
+  duration: '3 tháng',
+  slotName: 'Long',
+  id: '30fd42d2-8243-491b-b68f-6b75fac4ad38',
+};
+let credentials: any;
 export async function handleGetPassword(sender_psid: any) {
-  // validateUser(sender_psid);
+  callSendAPI(sender_psid, { text: `Mật khẩu của bạn là ${user.password}.` });
 }
-async function handleGetInfo() {}
-export async function validateUser(message: any, sender_psid: any) {
+export async function handleGetInfo(sender_psid: any) {}
+export async function validateUser(combo: any, sender_psid: any) {
   callSendAPI(sender_psid, {
-    text: 'Validating.',
+    text: 'Validating...',
   });
-  message = message.split('-');
-  console.log(message);
+  credentials = combo.split('-');
+
+  console.log(combo);
+
   const usersList = await chatService.logAllUser();
-  let user = usersList.find((user) => user.username === message[0]);
-  if (user?.password === message[1]) {
-    console.log(user);
-  }
+  if (
+    usersList.find((user) => user.username === combo[0])?.password === combo[1]
+  ) {
+    user = usersList.find((user) => user.username === combo[0]);
+    await callSendAPI(sender_psid, {
+      text: 'Welcome',
+    });
+    callSendAPI(sender_psid, await sendMenu());
+  } else
+    await callSendAPI(sender_psid, {
+      text: 'Invalid credentials. Check again.',
+    });
+  console.log(user);
+
 }
