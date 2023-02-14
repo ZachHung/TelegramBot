@@ -4,9 +4,9 @@ import { getEnv } from './helpers.js';
 import {
   handleGetStarted,
   handleGetPassword,
+  handleGetInfo,
   validateUser,
 } from './services_messenger.js';
-
 export const postWebhook = (req: any, res: any) => {
   let body = req.body;
   if (body.object === 'page') {
@@ -14,7 +14,7 @@ export const postWebhook = (req: any, res: any) => {
       let webhook_event = entry.messaging[0];
       let sender_psid = webhook_event.sender.id;
       let format = /[0-9A-Za-z]+@[0-9A-Za-z]+\.[A-Za-z]+-[0-9]/;
-      if (webhook_event.message?.text.match(format)) {
+      if (webhook_event.message?.text.match(getEnv('USER_FORMAT'))) {
         validateUser(webhook_event.message.text, sender_psid);
       } else if (webhook_event.message) {
         handleMessage(sender_psid, webhook_event.message);
@@ -71,12 +71,10 @@ async function handlePostback(sender_psid: any, received_postback: any) {
       await handleGetStarted(sender_psid);
       break;
     case 'GET_PASSWORD':
-      callSendAPI(sender_psid, {
-        text: 'Nhập mail và pass theo cấu trúc mail-pass.',
-      });
+      await handleGetPassword(sender_psid);
       break;
     case 'GET_INFO':
-      await handleGetStarted(sender_psid);
+      await handleGetInfo(sender_psid);
       break;
 
     default:
